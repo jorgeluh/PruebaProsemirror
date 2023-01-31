@@ -1,0 +1,32 @@
+{
+  "name": "pruebaprosemirror",
+  "version": "1.0.0",
+  "description": "Pruebas del editor WYSIWYG ProseMirror.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "generar": "babel src/index.js -o babel/index.js && webpack ./babel -o ./dist"
+  },
+  "keywords": [
+    "Prueba",
+    "ProseMirror",
+    "WYSIWYG",
+    "Editor"
+  ],
+  "author": "Jorge Lu",
+  "license": "ISC",
+  "dependencies": {
+    "prosemirror-model": "^1.19.0",
+    "prosemirror-schema-basic": "^1.2.1",
+    "prosemirror-state": "^1.4.2",
+    "prosemirror-transform": "^1.7.1",
+    "prosemirror-view": "^1.30.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.20.7",
+    "@babel/core": "^7.20.12",
+    "@babel/preset-env": "^7.20.2",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1"
+  }
+}

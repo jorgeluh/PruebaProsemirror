@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "generar": "babel src/index.js -o babel/index.js && webpack ./babel -o ./dist"
+    "generar": "babel src/index.js -o babel/index.js && webpack --mode development ./babel -o ./dist"
   },
   "keywords": [
     "Prueba",
@@ -16,10 +16,8 @@
   "author": "Jorge Lu",
   "license": "ISC",
   "dependencies": {
-    "prosemirror-commands": "^1.5.0",
     "prosemirror-example-setup": "^1.2.1",
-    "prosemirror-history": "^1.3.0",
-    "prosemirror-keymap": "^1.2.0",
+    "prosemirror-mentions": "^1.0.2",
     "prosemirror-model": "^1.19.0",
     "prosemirror-schema-basic": "^1.2.1",
     "prosemirror-state": "^1.4.2",

@@ -4,16 +4,13 @@ import { EditorState } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 
 // Plugins
-import { undo, redo, history } from "prosemirror-history"
-import { keymap } from "prosemirror-keymap";
-import { baseKeymap } from "prosemirror-commands";
+import { exampleSetup } from "prosemirror-example-setup";
+import "prosemirror-view/style/prosemirror.css";
+import "prosemirror-menu/style/menu.css";
+import "prosemirror-example-setup/style/style.css";
 
 let state = EditorState.create({
     schema,
-    plugins: [
-        history(),
-        keymap({ "Mod-z": undo, "Mod-y": redo }),
-        keymap(baseKeymap)
-    ]
+    plugins: exampleSetup({ schema: schema })
 });
 let vista = new EditorView(document.body, { state });

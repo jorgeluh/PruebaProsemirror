@@ -7,12 +7,13 @@ import { EditorView } from "prosemirror-view";
 import { Schema } from "prosemirror-model";
 import { exampleSetup } from "prosemirror-example-setup";
 import { addMentionNodes, addTagNodes, getMentionsPlugin } from "prosemirror-mentions";
+import { addListNodes } from "prosemirror-schema-list";
 import "prosemirror-view/style/prosemirror.css";
 import "prosemirror-menu/style/menu.css";
 import "prosemirror-example-setup/style/style.css";
 
 let esquema = new Schema({
-    nodes: addTagNodes(addMentionNodes(schema.spec.nodes)),
+    nodes: addListNodes(addTagNodes(addMentionNodes(schema.spec.nodes)), "paragraph block*", "block"),
     marks: schema.spec.marks
 });
 

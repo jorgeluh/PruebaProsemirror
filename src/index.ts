@@ -5,12 +5,15 @@ import { EditorView } from "prosemirror-view";
 
 // Plugins
 import { Schema } from "prosemirror-model";
-import { exampleSetup } from "prosemirror-example-setup";
+////import { exampleSetup } from "prosemirror-example-setup";
 import { addMentionNodes, addTagNodes, getMentionsPlugin } from "prosemirror-mentions";
 import { addListNodes } from "prosemirror-schema-list";
 import "prosemirror-view/style/prosemirror.css";
 import "prosemirror-menu/style/menu.css";
 import "prosemirror-example-setup/style/style.css";
+
+// Módulos propios
+import { crearMenu } from "./menu";
 
 let esquema = new Schema({
     nodes: addListNodes(addTagNodes(addMentionNodes(schema.spec.nodes)), "paragraph block*", "block"),
@@ -37,7 +40,7 @@ let pluginMenciones = getMentionsPlugin({
     }
 });
 
-let coleccionPlugins = exampleSetup({ schema: esquema });
+let coleccionPlugins = crearMenu(esquema); //exampleSetup({ schema: esquema });
 coleccionPlugins.unshift(pluginMenciones);
 
 let state = EditorState.create({

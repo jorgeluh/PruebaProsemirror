@@ -93,7 +93,10 @@ function crearBoton(tipoMarca: MarkType, titulo: string, icono: IconSpec): MenuI
  * @returns Los elementos que conforman la barra de herramientas del editor.
  */
 function crearElementosMenu(esquema: Schema): MenuElement[][] {
-    return [[ crearBoton(esquema.marks.strong, "Negrita", icons.strong) ]];
+    return [[
+        crearBoton(esquema.marks.strong, "Negrita", icons.strong),
+        crearBoton(esquema.marks.em, "Cursiva", icons.em),
+    ]];
 }
 
 /**

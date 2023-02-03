@@ -16,8 +16,11 @@
   "author": "Jorge Lu",
   "license": "ISC",
   "dependencies": {
+    "prosemirror-dropcursor": "^1.6.1",
     "prosemirror-example-setup": "^1.2.1",
+    "prosemirror-gapcursor": "^1.3.1",
     "prosemirror-mentions": "^1.0.2",
+    "prosemirror-menu": "^1.2.1",
     "prosemirror-model": "^1.19.0",
     "prosemirror-schema-basic": "^1.2.1",
     "prosemirror-state": "^1.4.2",

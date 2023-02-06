@@ -39,7 +39,7 @@ let pluginMenciones = getMentionsPlugin({
     }
 });
 
-let coleccionPlugins = crearMenu(esquema); //exampleSetup({ schema: esquema });
+let coleccionPlugins = crearMenu(esquema);
 coleccionPlugins.unshift(pluginMenciones);
 
 let state = EditorState.create({

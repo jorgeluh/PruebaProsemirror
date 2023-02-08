@@ -102,7 +102,7 @@ function crearBotonParaMarca(tipoMarca: MarkType, texto: string, icono: IconSpec
  * @returns Un {@link prosemirror-menu#MenuItem } que representa un botón con texto, un icono y una propiedad del texto que altera.
  */
 function crearBotonParaNodo(tipoNodo: NodeType, texto: string, icono: IconSpec): MenuItem {
-    let comando: Command = envolverEnLista(tipoNodo, { title: texto, icon: icono });
+    let comando: Command = envolverEnLista(tipoNodo, { tipo: TipoListaOrdenada.romanosMinusculas, title: texto, icon: icono });
     let propiedadesBoton: MenuItemSpec = {
         enable: estadoEditor => comando(estadoEditor),
         icon: icono,

@@ -6,7 +6,6 @@ import { EditorView } from "prosemirror-view";
 // Plugins
 import { Schema } from "prosemirror-model";
 import { addMentionNodes, addTagNodes, getMentionsPlugin } from "prosemirror-mentions";
-import { addListNodes } from "prosemirror-schema-list";
 import "prosemirror-view/style/prosemirror.css";
 import "prosemirror-menu/style/menu.css";
 import "prosemirror-example-setup/style/style.css";

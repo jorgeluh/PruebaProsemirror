@@ -1,5 +1,5 @@
 import OrderedMap from "orderedmap";
-import { Attrs, DOMOutputSpec, Fragment, NodeRange, NodeSpec, NodeType, Slice } from "prosemirror-model";
+import { Attrs, Fragment, NodeRange, NodeSpec, NodeType, Slice } from "prosemirror-model";
 import { orderedList } from "prosemirror-schema-list";
 import { Command, EditorState, Transaction } from "prosemirror-state";
 import { canSplit, findWrapping, ReplaceAroundStep } from "prosemirror-transform";
@@ -35,10 +35,30 @@ export function agregarNodosLista(nodes: OrderedMap<NodeSpec>, itemContent: stri
     })
   }
 
-const olDOM: DOMOutputSpec = ["ol", {type: "a"}, 0];
-
-export const listaOrdenada: NodeSpec = orderedList;
-listaOrdenada.toDOM = nodo => nodo.attrs.order == 1 ? olDOM : ["ol", {type: "a", start: nodo.attrs.order}, 0];
+export const listaOrdenada = {
+  attrs: {
+    order: { default: 1 },
+    tipo: { default: TipoListaOrdenada.romanosMinusculas },
+  },
+  parseDOM: [{
+    tag: "ol",
+    getAttrs(dom: HTMLElement) {
+      return {
+        order: dom.hasAttribute("start") ? +dom.getAttribute("start")! : 1,
+        tipo: dom.hasAttribute("type") ? +dom.getAttribute("type")! : TipoListaOrdenada.arabigos,
+      }
+    }
+  }],
+  toDOM: nodo => {
+    if (nodo.attrs.tipo == TipoListaOrdenada.arabigos) {
+      return nodo.attrs.order == 1 ? [ "ol", 0 ] : [ "ol", { start: nodo.attrs.order }, 0 ];
+    } else {
+      return nodo.attrs.order == 1 ?
+        [ "ol", { type: nodo.attrs.tipo }, 0 ] :
+        [ "ol", { type: nodo.attrs.tipo, start: nodo.attrs.order }, 0 ];
+    }
+  },
+} as NodeSpec;
 
 export function envolverEnLista(listType: NodeType, attrs: Attrs | null = null): Command {
     return function(state: EditorState, dispatch?: (tr: Transaction) => void) {
@@ -55,7 +75,6 @@ export function envolverEnLista(listType: NodeType, attrs: Attrs | null = null):
           range = new NodeRange($from, state.doc.resolve($to.end(range.depth)), range.depth)
         doJoin = true
       }
-      console.log(`Tipo de nodo: ${listType}`);
       let wrap = findWrapping(outerRange!, listType, attrs, range)
       if (!wrap) return false
       if (dispatch) dispatch(doWrapInList(state.tr, range, wrap, doJoin, listType).scrollIntoView())

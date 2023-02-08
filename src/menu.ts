@@ -9,6 +9,8 @@ import { MarkType, NodeType, Schema } from "prosemirror-model";
 import { liftListItem, sinkListItem, splitListItem, wrapInList } from "prosemirror-schema-list";
 import { Command, EditorState, Plugin } from "prosemirror-state";
 
+import { envolverEnLista, TipoListaOrdenada } from "./listas";
+
 /**
  * Determina si el cliente es un producto de Apple para identificar la tecla de comando o de control.
  */
@@ -100,12 +102,13 @@ function crearBotonParaMarca(tipoMarca: MarkType, texto: string, icono: IconSpec
  * @returns Un {@link prosemirror-menu#MenuItem } que representa un botón con texto, un icono y una propiedad del texto que altera.
  */
 function crearBotonParaNodo(tipoNodo: NodeType, texto: string, icono: IconSpec): MenuItem {
-    let comando: Command = wrapInList(tipoNodo, { title: texto, icon: icono });
+    let comando: Command = envolverEnLista(tipoNodo, { title: texto, icon: icono });
     let propiedadesBoton: MenuItemSpec = {
         enable: estadoEditor => comando(estadoEditor),
         icon: icono,
         label: texto,
         select: estadoEditor => comando(estadoEditor),
+        title: texto,
         run: comando,
     };
     return new MenuItem(propiedadesBoton);
@@ -179,7 +182,7 @@ function crearElementosMenu(esquema: Schema): MenuElement[][] {
         crearBotonParaMarca(esquema.marks.em, "Cursiva", icons.em),
     ], [
         crearMenuDesplegable("Listas numeradas", [
-            crearBotonParaNodo(esquema.nodes.ordered_list, "Números arábigos", icons.orderedList),
+            crearBotonParaNodo(esquema.nodes.lista_ordenada, "Números arábigos", icons.orderedList),
             crearBotonParaNodo(esquema.nodes.bullet_list, "Números arábigos", icons.bulletList),
         ]),
     ]];

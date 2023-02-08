@@ -13,9 +13,10 @@ import "prosemirror-example-setup/style/style.css";
 
 // Módulos propios
 import { crearMenu } from "./menu";
+import { agregarNodosLista, listaOrdenada } from "./listas";
 
 let esquema = new Schema({
-    nodes: addListNodes(addTagNodes(addMentionNodes(schema.spec.nodes)), "paragraph block*", "block"),
+    nodes: agregarNodosLista(addTagNodes(addMentionNodes(schema.spec.nodes)), "paragraph block*", "block"),
     marks: schema.spec.marks
 });
 

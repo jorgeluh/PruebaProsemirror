@@ -6,10 +6,10 @@ import { ellipsis, emDash, InputRule, inputRules, smartQuotes, undoInputRule, wr
 import { keymap } from "prosemirror-keymap";
 import { Dropdown, icons, IconSpec, menuBar, MenuElement, MenuItem, MenuItemSpec } from "prosemirror-menu";
 import { MarkType, NodeType, Schema } from "prosemirror-model";
-import { liftListItem, sinkListItem, splitListItem, wrapInList } from "prosemirror-schema-list";
+import { liftListItem, sinkListItem, splitListItem } from "prosemirror-schema-list";
 import { Command, EditorState, Plugin } from "prosemirror-state";
 
-import { envolverEnLista, TipoListaOrdenada } from "./listas";
+import { envolverEnLista, tipoListaOrdenada } from "./listas";
 
 /**
  * Determina si el cliente es un producto de Apple para identificar la tecla de comando o de control.
@@ -45,9 +45,9 @@ function crearReglaListaVinietas(tipoNodo: NodeType): InputRule {
  */
 function crearPluginEdicion(esquema: Schema): Plugin {
     let rules: InputRule[] = smartQuotes.concat(ellipsis, emDash);
-    let tipoNodo: any;
+    let tipoNodo: NodeType;
     if (tipoNodo = esquema.nodes.ordered_list) {
-       rules.push(crearReglaListaOrdenada(tipoNodo));
+        rules.push(crearReglaListaOrdenada(tipoNodo));
     }
 
     if (tipoNodo = esquema.nodes.bullet_list) {
@@ -97,12 +97,13 @@ function crearBotonParaMarca(tipoMarca: MarkType, texto: string, icono: IconSpec
 /**
  * Crea un elemento de tipo botón para la barra de herramientas del editor.
  * @param tipoNodo El tipo de nodo (propiedad de grupo de texto) del nodo.
+ * @param tipoLista El tipo de la lista, puede ser ordenada o de viñetas.
  * @param texto El título o texto descriptivo del botón.
  * @param icono El icono del botón.
  * @returns Un {@link prosemirror-menu#MenuItem } que representa un botón con texto, un icono y una propiedad del texto que altera.
  */
-function crearBotonParaNodo(tipoNodo: NodeType, texto: string, icono: IconSpec): MenuItem {
-    let comando: Command = envolverEnLista(tipoNodo, { tipo: TipoListaOrdenada.romanosMinusculas, title: texto, icon: icono });
+function crearBotonParaNodo(tipoNodo: NodeType, tipoLista: tipoListaOrdenada | string, texto: string, icono: IconSpec): MenuItem {
+    let comando: Command = envolverEnLista(tipoNodo, { tipo: tipoLista, title: texto, icon: icono });
     let propiedadesBoton: MenuItemSpec = {
         enable: estadoEditor => comando(estadoEditor),
         icon: icono,
@@ -182,8 +183,12 @@ function crearElementosMenu(esquema: Schema): MenuElement[][] {
         crearBotonParaMarca(esquema.marks.em, "Cursiva", icons.em),
     ], [
         crearMenuDesplegable("Listas numeradas", [
-            crearBotonParaNodo(esquema.nodes.lista_ordenada, "Números arábigos", icons.orderedList),
-            crearBotonParaNodo(esquema.nodes.bullet_list, "Números arábigos", icons.bulletList),
+            crearBotonParaNodo(esquema.nodes.lista_ordenada, tipoListaOrdenada.arabigos, "Números arábigos", icons.orderedList),
+            crearBotonParaNodo(esquema.nodes.lista_ordenada, tipoListaOrdenada.romanosMayusculas, "Números romanos en mayúsculas", icons.orderedList),
+            crearBotonParaNodo(esquema.nodes.lista_ordenada, tipoListaOrdenada.romanosMinusculas, "Números romanos en minúsculas", icons.orderedList),
+            crearBotonParaNodo(esquema.nodes.lista_ordenada, tipoListaOrdenada.alfabetoMayusculas, "Alfabeto en mayúsculas", icons.orderedList),
+            crearBotonParaNodo(esquema.nodes.lista_ordenada, tipoListaOrdenada.alfabetoMinusculas, "Alfabeto en minúsculas", icons.orderedList),
+            crearBotonParaNodo(esquema.nodes.bullet_list, "circle", "Números arábigos", icons.bulletList),
         ]),
     ]];
 }

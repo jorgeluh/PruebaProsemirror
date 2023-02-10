@@ -9,7 +9,7 @@ import { MarkType, NodeType, Schema } from "prosemirror-model";
 import { liftListItem, sinkListItem, splitListItem } from "prosemirror-schema-list";
 import { Command, EditorState, Plugin } from "prosemirror-state";
 
-import { envolverEnLista, tipoListaOrdenada } from "./listas";
+import { envolverEnLista, tipoListaOrdenada, tipoListaVinietas } from "./listas";
 
 /**
  * Determina si el cliente es un producto de Apple para identificar la tecla de comando o de control.
@@ -102,7 +102,8 @@ function crearBotonParaMarca(tipoMarca: MarkType, texto: string, icono: IconSpec
  * @param icono El icono del botón.
  * @returns Un {@link prosemirror-menu#MenuItem } que representa un botón con texto, un icono y una propiedad del texto que altera.
  */
-function crearBotonParaNodo(tipoNodo: NodeType, tipoLista: tipoListaOrdenada | string, texto: string, icono: IconSpec): MenuItem {
+function crearBotonParaNodo(
+    tipoNodo: NodeType, tipoLista: tipoListaOrdenada | tipoListaVinietas, texto: string, icono: IconSpec): MenuItem {
     let comando: Command = envolverEnLista(tipoNodo, { tipo: tipoLista, title: texto, icon: icono });
     let propiedadesBoton: MenuItemSpec = {
         enable: estadoEditor => comando(estadoEditor),
@@ -188,7 +189,12 @@ function crearElementosMenu(esquema: Schema): MenuElement[][] {
             crearBotonParaNodo(esquema.nodes.lista_ordenada, tipoListaOrdenada.romanosMinusculas, "Números romanos en minúsculas", icons.orderedList),
             crearBotonParaNodo(esquema.nodes.lista_ordenada, tipoListaOrdenada.alfabetoMayusculas, "Alfabeto en mayúsculas", icons.orderedList),
             crearBotonParaNodo(esquema.nodes.lista_ordenada, tipoListaOrdenada.alfabetoMinusculas, "Alfabeto en minúsculas", icons.orderedList),
-            crearBotonParaNodo(esquema.nodes.bullet_list, "circle", "Números arábigos", icons.bulletList),
+        ]),
+    ], [
+        crearMenuDesplegable("Listas de viñetas", [
+            crearBotonParaNodo(esquema.nodes.lista_vinietas, tipoListaVinietas.disco, "Disco", icons.bulletList),
+            crearBotonParaNodo(esquema.nodes.lista_vinietas, tipoListaVinietas.circulo, "Círculo", icons.bulletList),
+            crearBotonParaNodo(esquema.nodes.lista_vinietas, tipoListaVinietas.cuadrado, "Cuadrado", icons.bulletList),
         ]),
     ]];
 }

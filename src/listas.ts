@@ -5,11 +5,11 @@ import { Command, EditorState, Transaction } from "prosemirror-state";
 import { canSplit, findWrapping, ReplaceAroundStep } from "prosemirror-transform";
 
 /**
- * Define los posibles tipos de lista en los que se puede envolver un nodo.
+ * Define los posibles tipos de lista ordenada en los que se puede envolver un nodo.
  */
 export enum tipoListaOrdenada {
     /**
-     * Lista de números arábigos (1., 2., 3., ...) Es la opción predeterminada.
+     * Lista de números arábigos (1., 2., 3., ...). Es la opción predeterminada.
      */
     arabigos = "1",
 
@@ -32,6 +32,26 @@ export enum tipoListaOrdenada {
      * Lista alfabética en mayúscula (A., B., C., ...).
      */
     alfabetoMayusculas = "A",
+}
+
+/**
+ * Define los posibles tipos de lista de viñetas en los que se puede envolver un nodo.
+ */
+export enum tipoListaVinietas {
+    /**
+     * Un círculo relleno como viñeta. Es el tipo de lista de viñetas predeterminado.
+     */
+    disco = "disc",
+
+    /**
+     * Un círculo relleno como viñeta.
+     */
+    circulo = "circle",
+
+    /**
+     * Un cuadrado como viñeta.
+     */
+    cuadrado = "square",
 }
 
 /**
@@ -68,7 +88,7 @@ export const listaOrdenada = {
             return {
                 order: dom.hasAttribute("start") ? +dom.getAttribute("start")! : 1,
                 tipo: dom.hasAttribute("type") ? +dom.getAttribute("type")! : tipoListaOrdenada.arabigos,
-            }
+            };
         }
     }],
     toDOM: nodo => {
@@ -83,6 +103,25 @@ export const listaOrdenada = {
 } as NodeSpec;
 
 /**
+ * Especificación de {@link prosemirror-model#NodeSpec | tipo de nodo} de ProseMirror especial para listas de viñetas (`<ul>`) que además
+ * soporta un atributo para el tipo (`type`) de la lista.
+ */
+export const listaVinietas = {
+    attrs: {
+        tipo: { default: tipoListaVinietas.circulo },
+    },
+    parseDOM: [{
+        tag: "ul",
+        getAttrs(dom: HTMLElement) {
+            return {
+                tipo: dom.hasAttribute("type") ? +dom.getAttribute("type")! : tipoListaVinietas.disco,
+            };
+        }
+    }],
+    toDOM: nodo => ["ul", { type: nodo.attrs.tipo }, 0],
+} as NodeSpec;
+
+/**
  * Permite agregar los nodos de listas numeradas y de viñetas con tipos a los nodos de un esquema.
  * @param nodos Los nodos del esquema de documento.
  * @param contenido El contenido del elemento de la lista.
@@ -92,7 +131,7 @@ export const listaOrdenada = {
 export function agregarNodosListas(nodos: OrderedMap<NodeSpec>, contenido: string, grupoLista?: string): OrderedMap<NodeSpec> {
     return nodos.append({
         lista_ordenada: agregarPropiedades(listaOrdenada, { content: "list_item+", group: grupoLista }),
-        bullet_list: agregarPropiedades(bulletList, { content: "list_item+", group: grupoLista }),
+        lista_vinietas: agregarPropiedades(listaVinietas, { content: "list_item+", group: grupoLista }),
         list_item: agregarPropiedades(listItem, { content: contenido }),
     });
 }

@@ -1,6 +1,6 @@
 import OrderedMap from "orderedmap";
 import { Attrs, Fragment, Node, NodeRange, NodeSpec, NodeType, ResolvedPos, Slice } from "prosemirror-model";
-import { bulletList, listItem} from "prosemirror-schema-list";
+import { listItem} from "prosemirror-schema-list";
 import { Command, EditorState, Transaction } from "prosemirror-state";
 import { canSplit, findWrapping, ReplaceAroundStep } from "prosemirror-transform";
 

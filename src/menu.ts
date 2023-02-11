@@ -5,7 +5,7 @@ import { history, redo, undo } from "prosemirror-history";
 import { ellipsis, emDash, InputRule, inputRules, smartQuotes, undoInputRule, wrappingInputRule } from "prosemirror-inputrules";
 import { keymap } from "prosemirror-keymap";
 import { Dropdown, icons, IconSpec, menuBar, MenuElement, MenuItem, MenuItemSpec } from "prosemirror-menu";
-import { MarkType, NodeType, Schema } from "prosemirror-model";
+import { Attrs, MarkType, NodeType, Schema } from "prosemirror-model";
 import { liftListItem, sinkListItem, splitListItem } from "prosemirror-schema-list";
 import { Command, EditorState, Plugin } from "prosemirror-state";
 
@@ -80,8 +80,8 @@ function marcarActivo(estado: EditorState, tipoMarca: MarkType): boolean {
  * @param icono El icono del botón.
  * @returns Un {@link prosemirror-menu#MenuItem } que representa un botón con texto, un icono y una propiedad del texto que altera.
  */
-function crearBotonParaMarca(tipoMarca: MarkType, texto: string, icono: IconSpec): MenuItem {
-    let comando: Command = toggleMark(tipoMarca);
+function crearBotonParaMarca(tipoMarca: MarkType, texto: string, icono?: IconSpec, atributos?: Attrs): MenuItem {
+    let comando: Command = toggleMark(tipoMarca, atributos);
     let propiedadesBoton: MenuItemSpec = {
         active(state: EditorState) { return marcarActivo(state, tipoMarca); },
         enable: estadoEditor => comando(estadoEditor),
@@ -102,9 +102,8 @@ function crearBotonParaMarca(tipoMarca: MarkType, texto: string, icono: IconSpec
  * @param icono El icono del botón.
  * @returns Un {@link prosemirror-menu#MenuItem } que representa un botón con texto, un icono y una propiedad del texto que altera.
  */
-function crearBotonParaNodo(
-    tipoNodo: NodeType, tipoLista: tipoListaOrdenada | tipoListaVinietas, texto: string, icono: IconSpec): MenuItem {
-    let comando: Command = envolverEnLista(tipoNodo, { tipo: tipoLista, title: texto, icon: icono });
+function crearBotonParaNodo(tipoNodo: NodeType, texto: string, icono?: IconSpec, atributos?: Attrs): MenuItem {
+    let comando: Command = envolverEnLista(tipoNodo, atributos);
     let propiedadesBoton: MenuItemSpec = {
         enable: estadoEditor => comando(estadoEditor),
         icon: icono,
@@ -180,21 +179,34 @@ function construirMapeoTeclas(esquema: Schema): { [tecla: string]: Command } {
  */
 function crearElementosMenu(esquema: Schema): MenuElement[][] {
     return [[
+        crearMenuDesplegable("Tamaño de fuente", [
+            crearBotonParaMarca(esquema.marks.tamanio_fuente, "1", undefined, { tamanioFuente: 10 }),
+            crearBotonParaMarca(esquema.marks.tamanio_fuente, "2", undefined, { tamanioFuente: 15 }),
+            crearBotonParaMarca(esquema.marks.tamanio_fuente, "3", undefined, { tamanioFuente: 20 }),
+            crearBotonParaMarca(esquema.marks.tamanio_fuente, "4", undefined, { tamanioFuente: 25 }),
+            crearBotonParaMarca(esquema.marks.tamanio_fuente, "5", undefined, { tamanioFuente: 30 }),
+            crearBotonParaMarca(esquema.marks.tamanio_fuente, "6", undefined, { tamanioFuente: 35 }),
+            crearBotonParaMarca(esquema.marks.tamanio_fuente, "7", undefined, { tamanioFuente: 40 }),
+            crearBotonParaMarca(esquema.marks.tamanio_fuente, "8", undefined, { tamanioFuente: 45 }),
+            crearBotonParaMarca(esquema.marks.tamanio_fuente, "9", undefined, { tamanioFuente: 50 }),
+            crearBotonParaMarca(esquema.marks.tamanio_fuente, "10", undefined, { tamanioFuente: 55 }),
+        ]),
+    ], [
         crearBotonParaMarca(esquema.marks.strong, "Negrita", icons.strong),
         crearBotonParaMarca(esquema.marks.em, "Cursiva", icons.em),
     ], [
         crearMenuDesplegable("Listas numeradas", [
-            crearBotonParaNodo(esquema.nodes.lista_ordenada, tipoListaOrdenada.arabigos, "Números arábigos", icons.orderedList),
-            crearBotonParaNodo(esquema.nodes.lista_ordenada, tipoListaOrdenada.romanosMayusculas, "Números romanos en mayúsculas", icons.orderedList),
-            crearBotonParaNodo(esquema.nodes.lista_ordenada, tipoListaOrdenada.romanosMinusculas, "Números romanos en minúsculas", icons.orderedList),
-            crearBotonParaNodo(esquema.nodes.lista_ordenada, tipoListaOrdenada.alfabetoMayusculas, "Alfabeto en mayúsculas", icons.orderedList),
-            crearBotonParaNodo(esquema.nodes.lista_ordenada, tipoListaOrdenada.alfabetoMinusculas, "Alfabeto en minúsculas", icons.orderedList),
+            crearBotonParaNodo(esquema.nodes.lista_ordenada, "Números arábigos", undefined, { tipo: tipoListaOrdenada.arabigos }),
+            crearBotonParaNodo(esquema.nodes.lista_ordenada, "Números romanos en mayúsculas", undefined, { tipo: tipoListaOrdenada.romanosMayusculas }),
+            crearBotonParaNodo(esquema.nodes.lista_ordenada, "Números romanos en minúsculas", undefined, { tipo: tipoListaOrdenada.romanosMinusculas }),
+            crearBotonParaNodo(esquema.nodes.lista_ordenada, "Alfabético en mayúsculas", undefined, { tipo: tipoListaOrdenada.alfabetoMayusculas }),
+            crearBotonParaNodo(esquema.nodes.lista_ordenada, "Alfabético en minúsculas", undefined, { tipo: tipoListaOrdenada.alfabetoMinusculas }),
         ]),
     ], [
         crearMenuDesplegable("Listas de viñetas", [
-            crearBotonParaNodo(esquema.nodes.lista_vinietas, tipoListaVinietas.disco, "Disco", icons.bulletList),
-            crearBotonParaNodo(esquema.nodes.lista_vinietas, tipoListaVinietas.circulo, "Círculo", icons.bulletList),
-            crearBotonParaNodo(esquema.nodes.lista_vinietas, tipoListaVinietas.cuadrado, "Cuadrado", icons.bulletList),
+            crearBotonParaNodo(esquema.nodes.lista_vinietas, "Disco", undefined, { tipo: tipoListaVinietas.disco }),
+            crearBotonParaNodo(esquema.nodes.lista_vinietas, "Círculo", undefined, { tipo: tipoListaVinietas.circulo }),
+            crearBotonParaNodo(esquema.nodes.lista_vinietas, "Cuadrado", undefined, { tipo: tipoListaVinietas.cuadrado }),
         ]),
     ]];
 }

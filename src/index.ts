@@ -12,6 +12,7 @@ import { crearMenu } from "./menu";
 import { agregarNodosListas } from "./listas";
 import { crearPluginMenciones } from "./menciones";
 import { agregarMarcaTamanioFuente } from "./tamanioFuente";
+import { agregarMarcaTipoFuente } from "./tipoFuente";
 
 // Estilos
 import "prosemirror-view/style/prosemirror.css";
@@ -21,7 +22,7 @@ import "prosemirror-example-setup/style/style.css";
 // El esquema que define la estructura posible del documento.
 let esquema = new Schema({
     nodes: agregarNodosListas(addTagNodes(addMentionNodes(schema.spec.nodes)), "paragraph block*", "block"),
-    marks: agregarMarcaTamanioFuente(schema.spec.marks),
+    marks: agregarMarcaTipoFuente(agregarMarcaTamanioFuente(schema.spec.marks)),
 });
 
 // Se agregan los plugins por medio de funciones propias para crear el editor y configurar el plugin de menciones.

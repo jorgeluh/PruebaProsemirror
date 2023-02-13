@@ -10,6 +10,7 @@ import { liftListItem, sinkListItem, splitListItem } from "prosemirror-schema-li
 import { Command, EditorState, Plugin } from "prosemirror-state";
 
 import { envolverEnLista, tipoListaOrdenada, tipoListaVinietas } from "./listas";
+import { tipoFuente } from "./tipoFuente";
 
 /**
  * Determina si el cliente es un producto de Apple para identificar la tecla de comando o de control.
@@ -190,6 +191,12 @@ function crearElementosMenu(esquema: Schema): MenuElement[][] {
             crearBotonParaMarca(esquema.marks.tamanio_fuente, "8", undefined, { tamanioFuente: 45 }),
             crearBotonParaMarca(esquema.marks.tamanio_fuente, "9", undefined, { tamanioFuente: 50 }),
             crearBotonParaMarca(esquema.marks.tamanio_fuente, "10", undefined, { tamanioFuente: 55 }),
+        ]),
+    ], [
+        crearMenuDesplegable("Tipo de fuente", [
+            crearBotonParaMarca(esquema.marks.tipo_fuente, "Arial", undefined, { tipoFuente: tipoFuente.arial }),
+            crearBotonParaMarca(esquema.marks.tipo_fuente, "Times New Roman", undefined, { tipoFuente: tipoFuente.timesNewRoman }),
+            crearBotonParaMarca(esquema.marks.tipo_fuente, "Courier New", undefined, { tipoFuente: tipoFuente.courierNew }),
         ]),
     ], [
         crearBotonParaMarca(esquema.marks.strong, "Negrita", icons.strong),

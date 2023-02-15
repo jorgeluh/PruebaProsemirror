@@ -1,6 +1,6 @@
 import OrderedMap from "orderedmap";
 import { Attrs, Fragment, Node, NodeRange, NodeSpec, NodeType, ResolvedPos, Slice } from "prosemirror-model";
-import { listItem} from "prosemirror-schema-list";
+import { listItem, splitListItem} from "prosemirror-schema-list";
 import { Command, EditorState, Transaction } from "prosemirror-state";
 import { canSplit, findWrapping, ReplaceAroundStep } from "prosemirror-transform";
 
@@ -194,7 +194,7 @@ function ejecutarEnvolverEnLista(
  * @returns El comando para envolver un nodo en una lista ordenada o de viñetas.
  */
 export function envolverEnLista(tipoLista: NodeType, atributos: Attrs | null = null): Command {
-    return function(estadoEditor: EditorState, ejecutar?: (transaccion: Transaction) => void): boolean {
+    return function(estadoEditor: EditorState, ejecucion?: (transaccion: Transaction) => void): boolean {
         let { $from, $to } = estadoEditor.selection;
         let rango: NodeRange | null = $from.blockRange($to);
         let unir: boolean = false;
@@ -224,10 +224,29 @@ export function envolverEnLista(tipoLista: NodeType, atributos: Attrs | null = n
             return false;
         }
 
-        if (ejecutar) {
-            ejecutar(ejecutarEnvolverEnLista(estadoEditor.tr, rango, envoltorio, unir, tipoLista).scrollIntoView());
+        if (ejecucion) {
+            ejecucion(ejecutarEnvolverEnLista(estadoEditor.tr, rango, envoltorio, unir, tipoLista).scrollIntoView());
         }
 
         return true;
     }
 }
+
+/**
+ * Extiende la función {@link prosemirror-schema-lists#splitListItem | splitListItem} para que preserve las marcas (estilos) agregados al
+ * texto en el siguiente elemento de la lista.
+ * @param tipoNodo El tipo de nodo de la lista que se está editando.
+ * @returns Un comando que agrega un elemento a la lista existente preservando el estilo configurado.
+ */
+export function dividirElementoListaConMarcas(tipoNodo: NodeType): Command {
+    return function(estadoEditor: EditorState, ejecucion?: (transaccion: Transaction) => void): boolean {
+        return splitListItem(tipoNodo)(estadoEditor, ejecucion && ((transaccion: Transaction) => {
+            let marcas = estadoEditor.storedMarks || (estadoEditor.selection.$to.parentOffset && estadoEditor.selection.$from.marks());
+            if (marcas) {
+                transaccion.ensureMarks(marcas);
+            }
+
+            ejecucion(transaccion);
+        }));
+    };
+};

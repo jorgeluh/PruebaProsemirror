@@ -1,4 +1,4 @@
-import { baseKeymap, chainCommands, exitCode, joinDown, joinUp, lift, selectParentNode, toggleMark } from "prosemirror-commands";
+import { baseKeymap, chainCommands, createParagraphNear, exitCode, joinDown, joinUp, lift, liftEmptyBlock, newlineInCode, selectParentNode, splitBlockKeepMarks, toggleMark } from "prosemirror-commands";
 import { dropCursor } from "prosemirror-dropcursor";
 import { gapCursor } from "prosemirror-gapcursor";
 import { history, redo, undo } from "prosemirror-history";
@@ -6,10 +6,11 @@ import { ellipsis, emDash, InputRule, inputRules, smartQuotes, undoInputRule, wr
 import { keymap } from "prosemirror-keymap";
 import { Dropdown, icons, IconSpec, menuBar, MenuElement, MenuItem, MenuItemSpec } from "prosemirror-menu";
 import { Attrs, MarkType, NodeType, Schema } from "prosemirror-model";
-import { liftListItem, sinkListItem, splitListItem } from "prosemirror-schema-list";
-import { Command, EditorState, Plugin } from "prosemirror-state";
+import { liftListItem, sinkListItem } from "prosemirror-schema-list";
+import { Command, EditorState, Plugin, Transaction } from "prosemirror-state";
+import { EditorView } from "prosemirror-view";
 
-import { envolverEnLista, tipoListaOrdenada, tipoListaVinietas } from "./listas";
+import { dividirElementoListaConMarcas, envolverEnLista, tipoListaOrdenada, tipoListaVinietas } from "./listas";
 import { tipoFuente } from "./tipoFuente";
 
 /**
@@ -61,16 +62,16 @@ function crearPluginEdicion(esquema: Schema): Plugin {
 /**
  * Implementación de función {@link prosemirror-menu#MenuItemSpec.active } que se usa para determinar si la opción se encuentra habilitada o
  * no según el estado del editor (incluyendo la posición del cursor).
- * @param estado El estado del editor.
+ * @param estadoEditor El estado del editor.
  * @param tipoMarca El tipo de marca (propiedad de texto) del nodo.
  * @returns Un valor que indica si el control se encuentra activo (habilitado) o no.
  */
-function marcarActivo(estado: EditorState, tipoMarca: MarkType): boolean {
-    let { from, $from, to, empty } = estado.selection;
+function marcarActivo(estadoEditor: EditorState, tipoMarca: MarkType): boolean {
+    let { from, $from, to, empty } = estadoEditor.selection;
     if (empty) {
-        return !!tipoMarca.isInSet(estado.storedMarks || $from.marks());
+        return !!tipoMarca.isInSet(estadoEditor.storedMarks || $from.marks());
     } else {
-        return estado.doc.rangeHasMark(from, to, tipoMarca);
+        return estadoEditor.doc.rangeHasMark(from, to, tipoMarca);
     }
 }
 
@@ -152,7 +153,8 @@ function construirMapeoTeclas(esquema: Schema): { [tecla: string]: Command } {
     mapeos["Mod-I"] = toggleMark(esquema.marks.em);
 
     let nuevaLinea: NodeType = esquema.nodes.hard_break;
-    let comando: Command = chainCommands(exitCode, (estadoEditor, ejecucion) => {
+    let comando: Command = chainCommands(
+        exitCode, (estadoEditor: EditorState, ejecucion?: ((tr: Transaction) => void) | undefined): boolean => {
         if (ejecucion) {
             ejecucion(estadoEditor.tr.replaceSelectionWith(nuevaLinea.create()).scrollIntoView());
         }
@@ -165,7 +167,7 @@ function construirMapeoTeclas(esquema: Schema): { [tecla: string]: Command } {
         mapeos["Ctrl-Enter"] = comando;
     }
 
-    mapeos["Enter"] = splitListItem(esquema.nodes.list_item);
+    mapeos["Enter"] = dividirElementoListaConMarcas(esquema.nodes.list_item);
     mapeos["Tab"] = sinkListItem(esquema.nodes.list_item);
     mapeos["Shift-Tab"] = liftListItem(esquema.nodes.list_item);
 
@@ -181,16 +183,16 @@ function construirMapeoTeclas(esquema: Schema): { [tecla: string]: Command } {
 function crearElementosMenu(esquema: Schema): MenuElement[][] {
     return [[
         crearMenuDesplegable("Tamaño de fuente", [
-            crearBotonParaMarca(esquema.marks.tamanio_fuente, "1", undefined, { tamanioFuente: 10 }),
-            crearBotonParaMarca(esquema.marks.tamanio_fuente, "2", undefined, { tamanioFuente: 15 }),
-            crearBotonParaMarca(esquema.marks.tamanio_fuente, "3", undefined, { tamanioFuente: 20 }),
-            crearBotonParaMarca(esquema.marks.tamanio_fuente, "4", undefined, { tamanioFuente: 25 }),
-            crearBotonParaMarca(esquema.marks.tamanio_fuente, "5", undefined, { tamanioFuente: 30 }),
-            crearBotonParaMarca(esquema.marks.tamanio_fuente, "6", undefined, { tamanioFuente: 35 }),
-            crearBotonParaMarca(esquema.marks.tamanio_fuente, "7", undefined, { tamanioFuente: 40 }),
-            crearBotonParaMarca(esquema.marks.tamanio_fuente, "8", undefined, { tamanioFuente: 45 }),
-            crearBotonParaMarca(esquema.marks.tamanio_fuente, "9", undefined, { tamanioFuente: 50 }),
-            crearBotonParaMarca(esquema.marks.tamanio_fuente, "10", undefined, { tamanioFuente: 55 }),
+            crearBotonParaMarca(esquema.marks.tamanio_fuente, "1", undefined, { tamanioFuente: 8 }),
+            crearBotonParaMarca(esquema.marks.tamanio_fuente, "2", undefined, { tamanioFuente: 11 }),
+            crearBotonParaMarca(esquema.marks.tamanio_fuente, "3", undefined, { tamanioFuente: 14 }),
+            crearBotonParaMarca(esquema.marks.tamanio_fuente, "4", undefined, { tamanioFuente: 17 }),
+            crearBotonParaMarca(esquema.marks.tamanio_fuente, "5", undefined, { tamanioFuente: 20 }),
+            crearBotonParaMarca(esquema.marks.tamanio_fuente, "6", undefined, { tamanioFuente: 23 }),
+            crearBotonParaMarca(esquema.marks.tamanio_fuente, "7", undefined, { tamanioFuente: 26 }),
+            crearBotonParaMarca(esquema.marks.tamanio_fuente, "8", undefined, { tamanioFuente: 29 }),
+            crearBotonParaMarca(esquema.marks.tamanio_fuente, "9", undefined, { tamanioFuente: 32 }),
+            crearBotonParaMarca(esquema.marks.tamanio_fuente, "10", undefined, { tamanioFuente: 35 }),
         ]),
     ], [
         crearMenuDesplegable("Tipo de fuente", [
@@ -219,6 +221,19 @@ function crearElementosMenu(esquema: Schema): MenuElement[][] {
 }
 
 /**
+ * {@link prosemirror-state#Command | Comando} que reemplaza a la función predeterminada del comando de
+ * {@link prosemirror-commands#baseKeymap | baseKeymap} para la tecla "Enter" que preserva el estilo del párrafo anterior.
+ * @param estadoEditor El estado del editor.
+ * @param ejecucion El comando a ejecutar.
+ * @param vista La vista del editor de ProseMirror.
+ * @returns Un comando que inserta una nueva línea pero manteniendo las marcas (estilo) del párrafo anterior.
+ */
+function nuevaLinea(estadoEditor: EditorState, ejecucion?: ((tr: Transaction) => void) | undefined, vista?: EditorView): boolean {
+   chainCommands(newlineInCode, createParagraphNear, liftEmptyBlock, splitBlockKeepMarks)(estadoEditor, ejecucion, vista);
+   return true;
+}
+
+/**
  * Crea una lista de {@link prosemirror-state#Plugin | plugins} de ProseMirror que definen el menú de opciones y algunos plugins básicos
  * para permitir la edición.
  * @param esquema El esquema de ProseMirror para el documento. Es necesario para reconocer los tipos de nodos y marcas que soporta.
@@ -228,6 +243,7 @@ export function crearMenu(esquema: Schema): Plugin[] {
     let plugins: Plugin[] = [
         crearPluginEdicion(esquema),
         keymap(construirMapeoTeclas(esquema)),
+        keymap({ "Enter": nuevaLinea }),
         keymap(baseKeymap),
         dropCursor(),
         gapCursor(),

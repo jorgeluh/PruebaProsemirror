@@ -45,11 +45,11 @@ export function crearPluginMenciones(elementos: miembroMencion[]): Plugin {
             }, 0);
         },
         getSuggestionsHTML: (elementos: miembroMencion[], tipo: string) => {
-                if (tipo === "mention") {
-                    return generarHtmlMenciones(elementos);
-                }
-
-                return "";
+            if (tipo === "mention") {
+                return generarHtmlMenciones(elementos);
             }
-        });
+
+            return "";
+        }
+    });
 }
